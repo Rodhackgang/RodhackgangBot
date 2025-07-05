@@ -1,11 +1,12 @@
-const { makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
-const { Boom } = require('@hapi/boom');
-const path = require('path');
-const fs = require('fs');
-const chalk = require('chalk').default;
-const qrcode = require('qrcode-terminal');
-const P = require('pino');
-const { MongoClient } = require('mongodb');
+(async () => {
+    const { makeWASocket, useMultiFileAuthState, DisconnectReason } = await import('@whiskeysockets/baileys');
+    const { Boom } = await import('@hapi/boom');
+    const path = await import('path');
+    const fs = await import('fs');
+    const chalk = (await import('chalk')).default;  // 'chalk' est un module ESM
+    const qrcode = await import('qrcode-terminal');
+    const P = await import('pino');
+    const { MongoClient } = await import('mongodb');
 
 // URL MongoDB
 const uri = "mongodb+srv://chatgptburkina:chatgptburkina@cluster0.6yp5c3v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -209,3 +210,5 @@ if (!fs.existsSync(AUTH_DIR)) {
 
 // Démarrer le bot
 connectToWhatsApp();
+
+})();
