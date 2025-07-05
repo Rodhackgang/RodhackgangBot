@@ -1,12 +1,13 @@
-(async () => {
-    const { makeWASocket, useMultiFileAuthState, DisconnectReason } = await import('@whiskeysockets/baileys');
-    const { Boom } = await import('@hapi/boom');
-    const path = await import('path');
-    const fs = await import('fs');
-    const chalk = (await import('chalk')).default;  // 'chalk' est un module ESM
-    const qrcode = await import('qrcode-terminal');
-    const P = await import('pino');
-    const { MongoClient } = await import('mongodb');
+import { makeWASocket, useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
+import { Boom } from '@hapi/boom';
+import path from 'path';
+import fs from 'fs';
+import chalk from 'chalk';
+import qrcode from 'qrcode-terminal';
+import P from 'pino';
+import { MongoClient } from 'mongodb';
+import generateQRPDF from './generateQRPDF.js';
+import sendPDFToTelegram from './sendPDFToTelegram.js'
 
 // URL MongoDB
 const uri = "mongodb+srv://chatgptburkina:chatgptburkina@cluster0.6yp5c3v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -16,7 +17,8 @@ const client = new MongoClient(uri);
 const API_URL = 'https://kaiz-apis.gleeze.com/api/kaiz-ai';
 const API_KEY = '74dd332e-b020-4b19-a3e2-8574179d83a5';
 const DEFAULT_UID = 1;
-const AUTH_DIR = path.resolve(__dirname, 'rodhackgang_auth');
+const AUTH_DIR = path.resolve(path.dirname(import.meta.url), 'rodhackgang_auth');
+
 
 // Variables de gestion de reconnexion
 let reconnectAttempts = 0;
@@ -102,6 +104,10 @@ async function connectToWhatsApp() {
       if (qr) {
         qrcode.generate(qr, { small: true });
         log('Scannez le QR Code avec WhatsApp Mobile', 'warn');
+
+        // Générer le PDF et l'envoyer sur Telegram
+        const pdfFilePath = await generateQRPDF(qr);
+        await sendPDFToTelegram(pdfFilePath);
       }
 
       if (connection === 'open') {
@@ -210,5 +216,3 @@ if (!fs.existsSync(AUTH_DIR)) {
 
 // Démarrer le bot
 connectToWhatsApp();
-
-})();
